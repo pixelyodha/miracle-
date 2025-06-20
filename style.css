@@ -679,4 +679,15 @@ body {
 .message-sent .voice-message .voice-duration {
     color: rgba(255, 255, 255, 0.7);
 }
+.notification-dot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  background: red;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  z-index: 2;
+}
 
