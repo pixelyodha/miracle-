@@ -1337,17 +1337,24 @@ function showToastNotification(fromUser, message) {
   toast.innerHTML = `<span class="toast-user">${fromUser?.name || 'User'}:</span> ${msg}`;
   toast.classList.remove('hidden');
 
-  // Hide after 4 seconds
+  // Show notification in tab title
+  document.title = `🔔 New message from ${fromUser?.name || 'User'}!`;
+
+  // Hide after 4 seconds and restore title
   setTimeout(() => {
     toast.classList.add('hidden');
-  }, 60000);
+    document.title = originalTitle;
+  }, 4000);
 
   // Optional: Click to jump to chat
   toast.onclick = () => {
     if (fromUser && fromUser.uid) {
       selectUser(fromUser.uid, fromUser);
       toast.classList.add('hidden');
+      document.title = originalTitle;
     }
   };
 }
+
+const originalTitle = document.title;
 
