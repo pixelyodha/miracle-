@@ -1194,6 +1194,13 @@ if (document.readyState === 'loading') {
   initializeApp();
 }
 
+// Add this for real-time notification updates
+setInterval(() => {
+  if (state.currentUser && elements.usersList) {
+    renderUsersList();
+  }
+}, 1000);
+
 // Add reply state management
 function handleReplyClick(messageId, message) {
   state.replyingTo = {
