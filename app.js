@@ -323,11 +323,11 @@ function selectUser(uid, user) {
   if (state.selectedUser) {
     cleanupChatListeners();
   }
-  
+
   state.selectedUser = { uid, ...user };
-  
+
   // Update UI
-  renderUsersList();
+  // renderUsersList(); // REMOVE THIS LINE
   updateChatHeader();
   showChatInterface();
   loadMessages();
