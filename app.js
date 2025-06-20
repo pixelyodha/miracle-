@@ -291,27 +291,22 @@ function getUnreadCountForUser(uid) {
 }
 function createUserElement(uid, user) {
   const unreadCount = getUnreadCountForUser(uid);
-  const hasUnreadClass = unreadCount > 0 ? 'has-unread' : '';
-  const userDiv = document.createElement('div');
-  userDiv.className = `user-item ${state.selectedUser?.uid === uid ? 'active' : ''} ${hasUnreadClass}`;
-  userDiv.dataset.uid = uid;
-
-  const isOnline = user.online;
-  const statusClass = isOnline ? 'status-online' : 'status-offline';
-  const statusText = isOnline ? 'Online' : 'Offline';
-
+  const unreadBadge = unreadCount > 0
+    ? `<span class="unread-badge">${unreadCount}</span>`
+    : '';
   userDiv.innerHTML = `
-    <div class="flex items-center">
-      <div class="relative">
-        <img class="w-10 h-10 rounded-full" src="${user.photoURL || '/default-avatar.png'}" alt="${user.name}">
-        <div class="absolute bottom-0 right-0 w-3 h-3 ${statusClass} rounded-full border-2 border-white"></div>
-      </div>
-      <div class="ml-3 flex items-center">
-        <div class="font-semibold text-gray-800">${user.name}</div>
-      </div>
-      <div class="text-xs text-gray-500 ml-3">${statusText}</div>
+  <div class="flex items-center">
+    <div class="relative">
+      <img class="w-10 h-10 rounded-full" src="${user.photoURL || '/default-avatar.png'}" alt="${user.name}">
+      <div class="absolute bottom-0 right-0 w-3 h-3 ${statusClass} rounded-full border-2 border-white"></div>
     </div>
-  `;
+    <div class="ml-3 flex items-center">
+      <div class="font-semibold text-gray-800">${user.name}</div>
+      ${unreadBadge}
+    </div>
+    <div class="text-xs text-gray-500 ml-3">${statusText}</div>
+  </div>
+`;
 
   userDiv.addEventListener('click', () => selectUser(uid, user));
 
@@ -497,7 +492,7 @@ function createMessageElement(messageId, message) {
   replyButton.className = 'reply-button';
   replyButton.innerHTML = `
     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+      <path fill-rule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 007 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
     </svg>
   `;
   replyButton.onclick = (e) => {
