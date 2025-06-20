@@ -1344,7 +1344,7 @@ function showToastNotification(fromUser, message) {
   setTimeout(() => {
     toast.classList.add('hidden');
     document.title = originalTitle;
-  }, 4000);
+  }, 60000);
 
   // Optional: Click to jump to chat
   toast.onclick = () => {
