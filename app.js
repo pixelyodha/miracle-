@@ -236,6 +236,7 @@ function loadUsers() {
     console.log('Number of users found:', Object.keys(users).length);
     
     state.users = users;
+    listenToAllChats(); // <-- Add this line
     renderUsersList();
   }, (error) => {
     console.error('Error loading users:', error);
@@ -652,7 +653,7 @@ function detectMediaContent(text) {
   }
   
   // Check for image or audio URLs
-  const urlRegex = /(https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|mp3|wav|ogg|m4a))/i;
+  const urlRegex = /(https?:\/\/[^\s]+\.(jpg|jpeg|png|gif|webp|mp3|wav|ogg|m4a|mp4|webm|mov|avi))/i;
   const match = text.match(urlRegex);
   
   return match ? match[0] : null;
@@ -1344,7 +1345,7 @@ function showToastNotification(fromUser, message) {
   setTimeout(() => {
     toast.classList.add('hidden');
     document.title = originalTitle;
-  }, 10000);
+  }, 4000);
 
   // Optional: Click to jump to chat
   toast.onclick = () => {
@@ -1357,4 +1358,72 @@ function showToastNotification(fromUser, message) {
 }
 
 const originalTitle = document.title;
+
+// Listen to all chats with other users
+function listenToAllChats() {
+  if (!state.currentUser) return;
+  // Remove old listeners
+  Object.keys(state.messageListeners).forEach(chatId => {
+    const messagesRef = ref(database, `messages/${chatId}`);
+    off(messagesRef, state.messageListeners[chatId]);
+    delete state.messageListeners[chatId];
+  });
+
+  // Listen to all chats with other users
+  Object.keys(state.users).forEach(uid => {
+    if (uid === state.currentUser.uid) return;
+    const chatId = getChatId(state.currentUser.uid, uid);
+    const messagesRef = ref(database, `messages/${chatId}`);
+    const listener = onValue(messagesRef, (snapshot) => {
+      const messages = snapshot.val() || {};
+      const previousMessages = state.messages[chatId] || {};
+      const isNewMessage = Object.keys(messages).length > Object.keys(previousMessages).length;
+
+      // Find the latest message
+      let latestMsg = null;
+      Object.entries(messages).forEach(([key, msg]) => {
+        if (!latestMsg || (msg.timestamp > latestMsg.timestamp)) {
+          latestMsg = msg;
+        }
+      });
+
+      // Show toast if:
+      // - There is a new message
+      // - The message is from the other user
+      // - The chat is NOT currently open
+      if (
+        isNewMessage &&
+        latestMsg &&
+        latestMsg.from !== state.currentUser.uid &&
+        (!state.selectedUser || state.selectedUser.uid !== latestMsg.from)
+      ) {
+        showToastNotification(state.users[latestMsg.from], latestMsg);
+      }
+
+      state.messages[chatId] = messages;
+
+      // Only render messages if this chat is currently open
+      if (state.selectedUser && getChatId(state.currentUser.uid, state.selectedUser.uid) === chatId) {
+        renderMessages(messages);
+        markMessagesAsSeen();
+        if (isNewMessage) scrollToBottom(true);
+      }
+    });
+    state.messageListeners[chatId] = listener;
+  });
+}
+
+// Call listenToAllChats on user state change
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    state.currentUser = user;
+    listenToAllChats(); // Start listening to all chats
+  } else {
+    state.currentUser = null;
+    state.selectedUser = null;
+    
+    // Clean up listeners
+    cleanupChatListeners();
+  }
+});
 
