@@ -279,7 +279,16 @@ function renderUsersList() {
   
   console.log('Users list rendered successfully');
 }
-
+function getUnreadCountForUser(uid) {
+  if (!state.currentUser) return 0;
+  const chatId = getChatId(state.currentUser.uid, uid);
+  const messages = state.messages[chatId] || {};
+  let count = 0;
+  Object.values(messages).forEach(msg => {
+    if (msg.from === uid && !msg.seen) count++;
+  });
+  return count;
+}
 function createUserElement(uid, user) {
   const userDiv = document.createElement('div');
   userDiv.className = `user-item ${state.selectedUser?.uid === uid ? 'active' : ''}`;
@@ -1278,14 +1287,4 @@ document.addEventListener('keydown', (e) => {
     cancelReply();
   }
 });
-function getUnreadCountForUser(uid) {
-  if (!state.currentUser) return 0;
-  const chatId = getChatId(state.currentUser.uid, uid);
-  const messages = state.messages[chatId] || {};
-  let count = 0;
-  Object.values(messages).forEach(msg => {
-    if (msg.from === uid && !msg.seen) count++;
-  });
-  return count;
-}
 
