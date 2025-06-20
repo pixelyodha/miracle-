@@ -300,12 +300,12 @@ function createUserElement(uid, user) {
       <div class="relative">
         <img class="w-10 h-10 rounded-full" src="${user.photoURL || '/default-avatar.png'}" alt="${user.name}">
         <div class="absolute bottom-0 right-0 w-3 h-3 ${statusClass} rounded-full border-2 border-white"></div>
+      </div>
+      <div class="ml-3 flex items-center">
+        <div class="font-semibold text-gray-800">${user.name}</div>
         ${notificationDot}
       </div>
-      <div class="ml-3">
-        <div class="font-semibold text-gray-800">${user.name}</div>
-        <div class="text-xs text-gray-500">${statusText}</div>
-      </div>
+      <div class="text-xs text-gray-500 ml-3">${statusText}</div>
     </div>
   `;
 
