@@ -377,11 +377,34 @@ function loadMessages() {
     const messages = snapshot.val() || {};
     const previousMessages = state.messages[chatId] || {};
     const isNewMessage = Object.keys(messages).length > Object.keys(previousMessages).length;
-    
+
+    // Find the latest message
+    let latestMsg = null;
+    let latestKey = null;
+    Object.entries(messages).forEach(([key, msg]) => {
+      if (!latestMsg || (msg.timestamp > latestMsg.timestamp)) {
+        latestMsg = msg;
+        latestKey = key;
+      }
+    });
+
+    // Show toast if:
+    // - There is a new message
+    // - The message is from the other user
+    // - The chat is NOT currently open
+    if (
+      isNewMessage &&
+      latestMsg &&
+      latestMsg.from !== state.currentUser.uid &&
+      (!state.selectedUser || state.selectedUser.uid !== latestMsg.from)
+    ) {
+      showToastNotification(state.users[latestMsg.from], latestMsg);
+    }
+
     state.messages[chatId] = messages;
     renderMessages(messages);
     markMessagesAsSeen();
-    
+
     // Only scroll if there's a new message
     if (isNewMessage) {
       scrollToBottom(true);
@@ -1295,4 +1318,36 @@ document.addEventListener('keydown', (e) => {
     cancelReply();
   }
 });
+
+function showToastNotification(fromUser, message) {
+  const toast = document.getElementById('toastNotification');
+  if (!toast) return;
+
+  let msg = '';
+  if (message.text) {
+    msg = message.text;
+  } else if (message.type === 'voice') {
+    msg = 'Voice message';
+  } else if (message.mediaURL) {
+    msg = 'Media message';
+  } else {
+    msg = 'New message';
+  }
+
+  toast.innerHTML = `<span class="toast-user">${fromUser?.name || 'User'}:</span> ${msg}`;
+  toast.classList.remove('hidden');
+
+  // Hide after 4 seconds
+  setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 4000);
+
+  // Optional: Click to jump to chat
+  toast.onclick = () => {
+    if (fromUser && fromUser.uid) {
+      selectUser(fromUser.uid, fromUser);
+      toast.classList.add('hidden');
+    }
+  };
+}
 
