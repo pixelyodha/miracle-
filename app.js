@@ -290,19 +290,15 @@ function getUnreadCountForUser(uid) {
   return count;
 }
 function createUserElement(uid, user) {
+  const unreadCount = getUnreadCountForUser(uid);
+  const hasUnreadClass = unreadCount > 0 ? 'has-unread' : '';
   const userDiv = document.createElement('div');
-  userDiv.className = `user-item ${state.selectedUser?.uid === uid ? 'active' : ''}`;
+  userDiv.className = `user-item ${state.selectedUser?.uid === uid ? 'active' : ''} ${hasUnreadClass}`;
   userDiv.dataset.uid = uid;
 
   const isOnline = user.online;
   const statusClass = isOnline ? 'status-online' : 'status-offline';
   const statusText = isOnline ? 'Online' : 'Offline';
-
-  // Check for unread messages
-  const unreadCount = getUnreadCountForUser(uid);
-  const notificationDot = unreadCount > 0
-    ? `<span class="notification-dot"></span>`
-    : '';
 
   userDiv.innerHTML = `
     <div class="flex items-center">
@@ -312,7 +308,6 @@ function createUserElement(uid, user) {
       </div>
       <div class="ml-3 flex items-center">
         <div class="font-semibold text-gray-800">${user.name}</div>
-        ${notificationDot}
       </div>
       <div class="text-xs text-gray-500 ml-3">${statusText}</div>
     </div>
