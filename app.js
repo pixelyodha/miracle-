@@ -1340,7 +1340,7 @@ function showToastNotification(fromUser, message) {
   // Hide after 4 seconds
   setTimeout(() => {
     toast.classList.add('hidden');
-  }, 4000);
+  }, 60000);
 
   // Optional: Click to jump to chat
   toast.onclick = () => {
