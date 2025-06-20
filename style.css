@@ -684,3 +684,18 @@ body {
   /* Optional: add a border or shadow for more emphasis */
   /* border-left: 4px solid #ff5252; */
 }
+
+.unread-badge {
+  display: inline-block;
+  margin-left: 8px;
+  min-width: 18px;
+  height: 18px;
+  background: red;
+  color: #fff;
+  border-radius: 9px;
+  font-size: 12px;
+  text-align: center;
+  line-height: 18px;
+  padding: 0 5px;
+  font-weight: bold;
+}
