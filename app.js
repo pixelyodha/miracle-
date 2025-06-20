@@ -284,16 +284,23 @@ function createUserElement(uid, user) {
   const userDiv = document.createElement('div');
   userDiv.className = `user-item ${state.selectedUser?.uid === uid ? 'active' : ''}`;
   userDiv.dataset.uid = uid;
-  
+
   const isOnline = user.online;
   const statusClass = isOnline ? 'status-online' : 'status-offline';
   const statusText = isOnline ? 'Online' : 'Offline';
-  
+
+  // Check for unread messages
+  const unreadCount = getUnreadCountForUser(uid);
+  const notificationDot = unreadCount > 0
+    ? `<span class="notification-dot"></span>`
+    : '';
+
   userDiv.innerHTML = `
     <div class="flex items-center">
       <div class="relative">
         <img class="w-10 h-10 rounded-full" src="${user.photoURL || '/default-avatar.png'}" alt="${user.name}">
         <div class="absolute bottom-0 right-0 w-3 h-3 ${statusClass} rounded-full border-2 border-white"></div>
+        ${notificationDot}
       </div>
       <div class="ml-3">
         <div class="font-semibold text-gray-800">${user.name}</div>
@@ -301,9 +308,9 @@ function createUserElement(uid, user) {
       </div>
     </div>
   `;
-  
+
   userDiv.addEventListener('click', () => selectUser(uid, user));
-  
+
   return userDiv;
 }
 
@@ -1271,4 +1278,14 @@ document.addEventListener('keydown', (e) => {
     cancelReply();
   }
 });
+function getUnreadCountForUser(uid) {
+  if (!state.currentUser) return 0;
+  const chatId = getChatId(state.currentUser.uid, uid);
+  const messages = state.messages[chatId] || {};
+  let count = 0;
+  Object.values(messages).forEach(msg => {
+    if (msg.from === uid && !msg.seen) count++;
+  });
+  return count;
+}
 
