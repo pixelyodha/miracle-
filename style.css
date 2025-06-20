@@ -679,13 +679,8 @@ body {
 .message-sent .voice-message .voice-duration {
     color: rgba(255, 255, 255, 0.7);
 }
-.notification-dot {
-  display: inline-block;
-  margin-left: 6px;
-  width: 10px;
-  height: 10px;
-  background: red;
-  border-radius: 50%;
-  vertical-align: middle;
+.has-unread {
+  background: #d900ff !important;
+  /* Optional: add a border or shadow for more emphasis */
+  /* border-left: 4px solid #ff5252; */
 }
-
